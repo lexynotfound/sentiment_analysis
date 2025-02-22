@@ -1,0 +1,15 @@
+pandas
+numpy
+requests
+beautifulsoup4
+nltk
+scikit-learn
+matplotlib
+seaborn
+lxml
+selenium
+webdriver-manager
+tweepy
+google-api-python-client
+python-dotenv
+tensorflow
