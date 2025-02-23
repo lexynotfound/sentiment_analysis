@@ -10,6 +10,17 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from webdriver_manager.chrome import ChromeDriverManager
 
+# ========================= Cek Dan Muat DATASET =========================
+DATASET_PATH = "../data/news_scraping_results.csv"
+# Jika file sudah ada, baca dataset
+if os.path.exists(DATASET_PATH):
+    existing_df = pd.read_csv(DATASET_PATH)
+    exiting_urls = set(existing_df["url"])
+    print(f"📂 Dataset ditemukan! {len(existing_df)} data sudah tersedia.")
+else:
+    existing_df = pd.DataFrame(columns=["url", "title", "content"])
+    exiting_urls = set()
+    print("⚠️ Dataset belum ditemukan! Akan membuat dataset baru.")
 
 # ========================= SETUP SELENIUM UNTUK SCRAPING PENCARIAN =========================
 def get_search_results(query, num_results=10000, search_engine="duckduckgo"):
@@ -134,15 +145,19 @@ def scrape_news(queries, num_results=13500):
             break
 
     # Simpan ke CSV
-    df = pd.DataFrame(articles)
-    df.to_csv("../data/news_scraping_results.csv", index=False)
-    print(f"✅ Scraping selesai! {len(df)} berita disimpan dalam 'data/news_scraping_results.csv'")
-
+    if articles:
+        df_new = pd.DataFrame(articles)
+        df_combined = pd.concat([existing_df, df_new], ignore_index=True)
+        df_combined.to_csv(DATASET_PATH, index=False)
+        print(f"✅ Scraping selesai! {len(df_new)} berita baru ditambahkan. Total sekarang: {len(df_combined)} berita.")
+    else:
+        print("⚠️ Tidak ada berita baru yang berhasil diambil.")
 
 # ========================= JALANKAN SCRAPING =========================
 if __name__ == "__main__":
     os.makedirs("data", exist_ok=True)  # Pastikan folder data ada
     listQuery = [
+        "danantara",
         "politik indonesia",
         "indonesia gelap",
         "makan siang gratis",
@@ -155,4 +170,4 @@ if __name__ == "__main__":
     ]
 
     for query in listQuery:
-        scrape_news([query], num_results=3500 // len(listQuery))  # Proses kata kunci satu per satu
+        scrape_news([query], num_results=13500 // len(listQuery))  # Proses kata kunci satu per satu
