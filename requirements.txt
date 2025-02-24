@@ -13,3 +13,4 @@ tweepy
 google-api-python-client
 python-dotenv
 tensorflow
+keras
